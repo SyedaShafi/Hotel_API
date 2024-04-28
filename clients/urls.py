@@ -17,4 +17,3 @@ urlpatterns = [
     path('logout/', UserLogoutView.as_view(), name='logout'),
     path('active/<uid64>/<token>', activate, name='activate')
 ]
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.CLIENTS_MEDIA_ROOT)

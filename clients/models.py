@@ -4,7 +4,6 @@ from . constants import GENDER_TYPE
 
 class UserAccount(models.Model):
     user = models.OneToOneField(User, related_name='account', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='clients/images/')
     account_no = models.IntegerField(unique=True)
     birth_date = models.DateField(null = True, blank=True)
     gender = models.CharField(max_length=50, choices = GENDER_TYPE)

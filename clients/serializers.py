@@ -15,14 +15,13 @@ class ClientSerializer(serializers.ModelSerializer):
 
 class UserAccountSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(required = True)
-    image = serializers.ImageField(write_only=True, required=True)  
     birth_date = serializers.DateField(allow_null=True, required=False)
     gender = serializers.ChoiceField(choices=GENDER_TYPE)
     phone = serializers.CharField(max_length=30)
   
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'password', 'confirm_password', 'image', 'gender', 'birth_date', 'phone' ]
+        fields = ['username', 'first_name', 'last_name', 'email', 'password', 'confirm_password', 'gender', 'birth_date', 'phone' ]
     
     def save(self):
         username = self.validated_data['username']
@@ -31,7 +30,6 @@ class UserAccountSerializer(serializers.ModelSerializer):
         email = self.validated_data['email']
         password = self.validated_data['password']
         password2 = self.validated_data['confirm_password']
-        image = self.validated_data['image']
         gender = self.validated_data['gender']
         birth_date = self.validated_data['birth_date']
         phone = self.validated_data['phone']
