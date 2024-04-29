@@ -11,7 +11,7 @@ class UserTransactionSerializer(serializers.ModelSerializer):
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
-        fields = ['account', 'amount']
+        fields = ['amount']
 
     def validate_amount(self, value):
         if value <= 1000:
@@ -36,6 +36,6 @@ PACKAGE_TYEP = (
     ('3', '3'),
 )
 
-class ReservationRequestSerializer(serializers.Serializer):
-    hotel_id = serializers.IntegerField()
-    package = serializers.ChoiceField(choices=PACKAGE_TYEP)
+# class ReservationRequestSerializer(serializers.Serializer):
+#     hotel_id = serializers.IntegerField()
+#     package = serializers.ChoiceField(choices=PACKAGE_TYEP)

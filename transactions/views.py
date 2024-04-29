@@ -10,7 +10,7 @@ from hotels.models import Hotel
 from reservations.models import Reservations
 from clients.models import UserAccount
 
-
+from reservations.serializers import ReservationsSerializer
 
 class TransactionViewset(viewsets.ModelViewSet):
     queryset = Transaction.objects.all() 
@@ -51,17 +51,16 @@ class DepositMoneyViewSet(APIView):
 
 
 class ReservationView(APIView):
-    serializer_class = serializers.ReservationRequestSerializer
-
+    serializer_class = ReservationsSerializer
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            hotel_id = serializer.validated_data['hotel_id']
+            hotel = serializer.validated_data['hotel']
             package = serializer.validated_data['package']
             user = request.user
 
             try:
-                hotel = Hotel.objects.get(id=hotel_id)
+                hotel = Hotel.objects.get(id=hotel.id)
             except Hotel.DoesNotExist:
                 return Response({"error": "Hotel not found."}, status=status.HTTP_404_NOT_FOUND)
             
