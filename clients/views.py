@@ -23,28 +23,39 @@ class ClientViewset(viewsets.ModelViewSet):
 
 
 class UserRegistrationAPIView(APIView):
-    serializer_class = UserAccountSerializer 
+    serializer_class = UserAccountSerializer
+
     def post(self, request):
-        serializer = self.serializer_class(data = request.data)
-       
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
-            print(f"User: {user}")
-            token = default_token_generator.make_token(user)
-            print(f"token: {token}")
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            print(f"UID: {uid}")
-            confirm_link = f"https://hotel-api-99rb.onrender.com/clients/active/{uid}/{token}"
-            email_subject = "Confirm Your Email"
-            email_body = render_to_string('confirm_email.html', {'confirm_link' : confirm_link})
+            serializer.save()
+            return Response("User registered successfully", status=201)
+        return Response(serializer.errors, status=400)
 
-            email = EmailMultiAlternatives(email_subject, '', to=[user.email])
 
-            email.attach_alternative(email_body, "text/html")
+    
+    # previous code
+    # serializer_class = UserAccountSerializer 
+    # def post(self, request):
+    #     serializer = self.serializer_class(data = request.data)
+    #     if serializer.is_valid():
+    #         user = serializer.save()
+    #         print(f"User: {user}")
+    #         token = default_token_generator.make_token(user)
+    #         print(f"token: {token}")
+    #         uid = urlsafe_base64_encode(force_bytes(user.pk))
+    #         print(f"UID: {uid}")
+    #         confirm_link = f"https://hotel-api-99rb.onrender.com/clients/active/{uid}/{token}"
+    #         email_subject = "Confirm Your Email"
+    #         email_body = render_to_string('confirm_email.html', {'confirm_link' : confirm_link})
 
-            email.send()
-            return Response("Check your mail for confirmation")
-        return Response(serializer.errors)
+    #         email = EmailMultiAlternatives(email_subject, '', to=[user.email])
+
+    #         email.attach_alternative(email_body, "text/html")
+
+    #         email.send()
+    #         return Response("Check your mail for confirmation")
+    #     return Response(serializer.errors)
     
 
 def activate(request, uid64, token):
@@ -66,27 +77,46 @@ def activate(request, uid64, token):
 
 class UserLoginAPIView(APIView):
     def post(self, request):
-        serializer = UserLoginSerializer(data = self.request.data)
+        serializer = UserLoginSerializer(data=self.request.data)
         if serializer.is_valid():
-            username = serializer._validated_data['username']
-            password = serializer._validated_data['password']
-
-            user = authenticate(username = username, password = password)
-
+            username = serializer.validated_data['username']
+            password = serializer.validated_data['password']
+            print(username)
+            print(password)
+            
+            user = authenticate(username=username, password=password)
+            print(user)
             if user:
-                token, create = Token.objects.get_or_create(user=user)
                 login(request, user)
-                return Response({'token': token.key, 'user_id': user.id})
+                return Response({'message': 'Login successful'})
             else:
-                return Response({'error': "Invalid Credentials"})
+                return Response({'error': 'Invalid credentials'}, status=400)
         
-        return Response(serializer.errors)
+        return Response(serializer.errors, status=400)
+
+
+    # previous code
+    # def post(self, request):
+    #     serializer = UserLoginSerializer(data = self.request.data)
+    #     if serializer.is_valid():
+    #         username = serializer._validated_data['username']
+    #         password = serializer._validated_data['password']
+
+    #         user = authenticate(username = username, password = password)
+
+    #         if user:
+    #             token, create = Token.objects.get_or_create(user=user)
+    #             login(request, user)
+    #             return Response({'token': token.key, 'user_id': user.id})
+    #         else:
+    #             return Response({'error': "Invalid Credentials"})
+        
+    #     return Response(serializer.errors)
 
 
 
 class UserLogoutView(APIView):
     def get(self, request):
-        request.user.auth_token.delete()
         logout(request)
         return redirect('login')
         

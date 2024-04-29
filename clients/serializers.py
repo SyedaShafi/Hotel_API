@@ -40,13 +40,13 @@ class UserAccountSerializer(serializers.ModelSerializer):
         
         if User.objects.filter(email = email).exists():
             raise serializers.ValidationError({'error': 'Email already exists.'})
+    
         
         account = User(username = username, first_name = first_name, last_name=last_name, email = email)
 
         user_account = models.UserAccount(user = account, birth_date = birth_date, gender=gender, phone=phone, balance = balance)
 
         account.set_password(password)
-        account.is_active = False
         print(account)
         account.save()
         user_account.save()
