@@ -5,7 +5,6 @@ from . import models
 from . import serializers
 # Create your views here.
 class ReservationsViewset(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticatedOrReadOnly ]
     queryset = models.Reservations.objects.all()
     serializer_class = serializers.ReservationsSerializer
 
