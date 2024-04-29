@@ -43,7 +43,7 @@ class UserAccountSerializer(serializers.ModelSerializer):
         
         account = User(username = username, first_name = first_name, last_name=last_name, email = email)
 
-        user_account = models.UserAccount(user = account, image=image, birth_date = birth_date, gender=gender, phone=phone, balance = balance)
+        user_account = models.UserAccount(user = account, birth_date = birth_date, gender=gender, phone=phone, balance = balance)
 
         account.set_password(password)
         account.is_active = False
