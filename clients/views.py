@@ -28,7 +28,8 @@ class UserRegistrationAPIView(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            user = serializer.save()
+            default_token_generator.make_token(user)
             return Response("User registered successfully", status=201)
         return Response(serializer.errors, status=400)
 
@@ -58,20 +59,20 @@ class UserRegistrationAPIView(APIView):
     #     return Response(serializer.errors)
     
 
-def activate(request, uid64, token):
-    try:
-        uid = urlsafe_base64_decode(uid64).decode()
-        user = User._default_manager.get(pk = uid)
-    except(User.DoesNotExist):
-        user = None
+# def activate(request, uid64, token):
+#     try:
+#         uid = urlsafe_base64_decode(uid64).decode()
+#         user = User._default_manager.get(pk = uid)
+#     except(User.DoesNotExist):
+#         user = None
 
-    if user is not None and default_token_generator.check_token(user, token):
-        user.is_active = True
-        user.save()
-        return redirect('login')
+#     if user is not None and default_token_generator.check_token(user, token):
+#         user.is_active = True
+#         user.save()
+#         return redirect('login')
     
-    else:
-        return redirect('register')
+#     else:
+#         return redirect('register')
     
 
 
@@ -86,11 +87,14 @@ class UserLoginAPIView(APIView):
             
             user = authenticate(username=username, password=password)
             print(user)
+           
             if user:
+                token, create = Token.objects.get_or_create(user=user)
                 login(request, user)
-                return Response({'message': 'Login successful'})
+                print(token.key, user.id)
+                return Response({'token': token.key, 'user_id': user.id})
             else:
-                return Response({'error': 'Invalid credentials'}, status=400)
+                return Response({'error': "Invalid Credentials"})
         
         return Response(serializer.errors, status=400)
 
